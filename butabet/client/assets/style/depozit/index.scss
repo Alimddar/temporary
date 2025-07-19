@@ -1,0 +1,383 @@
+@import "../../common";
+@import "../../header";
+@import "../../bottom";
+
+//*  DEPOZIT DESKTOP
+
+body {
+  background-color: $background-c;
+}
+main {
+  margin-top: 15px;
+  padding-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+main .container {
+  width: 83%;
+  display: flex;
+
+  .account-content {
+    flex: 1;
+    background: #ececec;
+
+    .content-title {
+      background: #d9d9d9;
+      font-size: 13px;
+      font-weight: 600;
+      border-left: 3px solid $text-yellow;
+    }
+  }
+  .depozit-content {
+    flex: 4;
+    background-color: rgb(231 231 231);
+
+    .content-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 27px;
+    }
+  }
+
+  .depozit-content .back {
+    display: none;
+  }
+}
+
+// account content
+main .wrapper {
+  font-size: 13px;
+  padding-bottom: 20px;
+}
+
+main .wrapper .category {
+  margin-bottom: 5px;
+}
+
+main .wrapper .category hr {
+  border-top: 0.0625rem dashed #333;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  margin: 1.6875rem auto 0;
+  width: calc(100% - 3.125rem);
+}
+
+main .container .content-title {
+  height: 35px;
+  padding-left: 27px;
+  line-height: 35px;
+}
+
+main .container .wrapper .wrapper-title {
+  font-weight: 400;
+  padding: 10px 0;
+  padding-left: 24px;
+  color: #696969;
+}
+
+main .wrapper .sub-category ul li {
+  transition: background-color 120ms ease-in, color 120ms ease-in;
+  height: 31px;
+  position: relative;
+  line-height: 31px;
+  margin-bottom: 5px;
+  color: #949494;
+
+  a {
+    color: inherit;
+    position: absolute;
+    top: 0;
+    border-left: 2px solid transparent;
+    padding-left: 21px;
+    left: 0;
+    width: 100%;
+
+    &:hover {
+      background: #e2e2e2;
+      color: #222;
+      border-left: 2px solid $text-yellow;
+    }
+
+    &.active {
+      background: #e2e2e2;
+      color: #222;
+      border-left: 2px solid $text-yellow;
+    }
+  }
+}
+
+// depozit content
+.depozit-content .content-title {
+  background: $text-yellow;
+  color: #fff;
+  font-weight: 600;
+}
+
+.depozit-content .card-groups {
+  display: flex;
+  margin-top: 10px;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.depozit-content .card-groups .card {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  margin-bottom: 5px;
+  font-size: 13px;
+
+  p.secondary {
+    opacity: 0.8;
+    font-size: 12px;
+  }
+}
+
+.card-groups .card .forward {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 0;
+  background: #eee;
+  gap: 5px;
+
+  .card-image {
+    flex: 2;
+
+    img {
+      width: 60%;
+      margin: 0 auto;
+      height: 95%;
+    }
+  }
+  .card-type {
+    flex: 2;
+  }
+  .card-service {
+    flex: 2;
+  }
+  .card-limit {
+    flex: 2;
+  }
+  .arrow {
+    flex: 1;
+    background-color: #dadada;
+    height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.turn i {
+      transform: rotateZ(0);
+    }
+
+    i {
+      font-size: 18px;
+      font-weight: 600;
+      transform: rotateZ(-90deg);
+      transition: 0.3s all;
+    }
+  }
+}
+
+.card-groups .card .backward {
+  display: none;
+
+  &.show {
+    display: block;
+  }
+}
+
+.card-groups .card .backward .content-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  padding-left: 22px;
+  padding-bottom: 3px;
+  font-size: 16px;
+  line-height: 50px;
+  border-bottom: 1px solid #b7b7b7;
+
+  img {
+    width: 62px;
+    height: 31px;
+  }
+}
+
+.card-groups .card .backward .content-description {
+  display: flex;
+
+  .amount {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .description {
+    flex: 1;
+  }
+}
+.content-description .amount {
+  padding-top: 25px;
+}
+.content-description .amount form .input-content {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+
+  input {
+    width: 200px;
+    outline: none;
+    height: 29px;
+    border: none;
+    padding-left: 5px;
+  }
+}
+
+.content-description .amount form {
+  button {
+    margin: 0 auto;
+    margin-top: 20px;
+    @include btn;
+    padding: 18px 28px;
+    width: 170px;
+    margin-left: 65px;
+  }
+}
+
+.content-description .amount form .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.content-description .description {
+  margin-top: 25px;
+
+  .box {
+    width: 80%;
+    background-color: #eee;
+    padding: 30px;
+    padding-top: 9px;
+    padding-left: 9px;
+    border-radius: 5px;
+  }
+}
+
+@media (max-width: 1024px) {
+  main .container {
+    width: 90%;
+  }
+}
+
+@media (max-width: 991px) {
+  main .container .account-content {
+    display: none;
+  }
+
+  main .container .depozit-content .back {
+    display: block;
+    transform: rotateZ(90deg);
+  }
+}
+
+@media (max-width: 768px) {
+  main .container .depozit-content {
+    background: transparent;
+  }
+
+  .depozit-content .card-groups {
+    margin-top: 0;
+    padding: 0;
+  }
+  .card-groups .card .forward .card-image {
+    flex: 1;
+  }
+  .card-groups .card .forward .card-image img {
+    width: 90px;
+    height: 45px;
+  }
+  .card-groups .card .forward .card-service {
+    display: none;
+  }
+  .card-groups .card .forward .card-limit {
+    display: none;
+  }
+
+  .card-groups .card .backward {
+    background-color: #fff;
+  }
+
+  .card-groups .card .backward .content-head {
+    font-size: 13px;
+  }
+  .card-groups .card .backward .content-head img {
+    display: none;
+  }
+  .card-groups .card .backward .content-description {
+    flex-direction: column;
+  }
+
+  .amount form {
+    width: 100%;
+  }
+
+  .content-description .amount form .input-content input {
+    border: 2px solid #eee;
+    border-radius: 5px;
+    width: 220px;
+  }
+  .content-description .amount form .input-content {
+    flex-direction: column;
+    margin-left: 20px;
+    width: 80%;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .content-description .amount form button {
+    margin: 0;
+    margin-left: 20px;
+    margin-top: 20px;
+    width: 220px;
+  }
+
+  .content-description .description .desc-title {
+    text-align: center;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #eee;
+  }
+  .content-description .description .box {
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 15px;
+  }
+}
+
+
+@media (max-width: 500px) {
+
+  .amount form {
+    padding: 0 20px;
+  }
+  .content-description .amount form .input-content {
+    width: 100%;
+    margin: 0;
+  }
+  .content-description .amount form .input-content input {
+    width: 100%;
+    height: 32px;
+  }
+  .content-description .amount form button {
+    width: 100%;
+    margin: 0;
+    margin-top: 20px;
+  }
+}

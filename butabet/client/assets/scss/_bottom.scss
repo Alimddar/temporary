@@ -1,0 +1,158 @@
+@import "../assets/common";
+
+
+
+footer {
+  background-color: $background-c;
+  border-top: 5px solid red;
+  padding: 30px 0;
+}
+
+footer .wrapper {
+  width: 90%;
+  margin: 0 auto;
+}
+
+footer .wrapper .menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  nav {
+    display: flex;
+    flex: 4;
+  }
+  .logo-content {
+    flex: 1;
+  }
+}
+
+footer .wrapper .menu .main {
+  display: flex;
+  width: 100%;
+
+  // * section
+  li {
+    flex: 1;
+
+    span {
+      color: $text-yellow;
+    }
+  }
+
+  li ul li {
+    margin-top: 5px;
+  }
+  li ul li a {
+    color: #fff;
+    font-size: 13px;
+    transition: 0.3s all;
+
+    &:hover {
+      color: $text-yellow;
+    }
+  }
+}
+
+
+@media (max-width: 1024px) {
+  footer .wrapper .menu {
+    display: none;
+  }
+}
+
+footer .cards-content {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+
+  .part__1 {
+    display: flex;
+    gap: 20px;
+  }
+
+  .part__2 {
+    display: flex;
+    gap: 20px;
+
+    img {
+      height: 21px;
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  footer .cards-content {
+    flex-direction: column;
+
+  }
+
+  footer .cards-content .part__2 {
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+}
+
+footer .partnership-content {
+  display: flex;
+  margin-top: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+
+  img {
+    width: 81px;
+    margin-right: 5px;
+    height: 31px;
+  }
+}
+
+footer .copyright-content {
+  display: flex;
+  margin: 25px;
+  justify-content: space-between;
+  align-items: center;
+
+  .download {
+    display: flex;
+    align-items: center;
+  }
+
+  span {
+    color: $text-yellow;
+  }
+
+  .social-items {
+    margin-right: 16px;
+    a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 5px;
+      i {
+        font-size: 1.2rem;
+      }
+
+      @media (min-width: 1600px) {
+        font-size: 1.4rem;
+      }
+    }
+  }
+
+  .download-items {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 991px) {
+
+  footer .copyright-content span {
+    font-size: 13px;
+  } 
+
+
+  footer .copyright-content .download {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Management - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar-active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        .dark-input {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: #f9fafb;
+            transition: all 0.3s ease;
+        }
+        .dark-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            background-color: #111827;
+        }
+        .dark-input:read-only {
+            background-color: #374151;
+            color: #9ca3af;
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+        }
+        .form-group {
+            position: relative;
+        }
+        .floating-label {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            color: #9ca3af;
+        }
+        .floating-label.active {
+            top: -8px;
+            left: 8px;
+            font-size: 0.75rem;
+            background: #1f2937;
+            padding: 0 4px;
+            color: #6366f1;
+        }
+        .floating-label.readonly {
+            color: #6b7280;
+        }
+        .input-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+        .currency-flag {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            background: #374151;
+        }
+        .balance-card {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .balance-change {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .balance-diff {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .balance-diff.positive {
+            color: #10b981;
+        }
+        .balance-diff.negative {
+            color: #ef4444;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to { 
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        .btn-secondary {
+            background: #374151;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        .amount-preset {
+            background: #374151;
+            border: 1px solid #4b5563;
+            color: #d1d5db;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .amount-preset:hover {
+            background: #4b5563;
+            border-color: #6366f1;
+        }
+        .amount-preset.active {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-800 shadow-lg">
+            <div class="p-6">
+                <div class="gradient-bg text-white p-4 rounded-lg text-center">
+                    <h1 class="text-xl font-bold">Admin Panel</h1>
+                    <p class="text-sm opacity-90">Management Dashboard</p>
+                </div>
+            </div>
+            
+            <nav class="mt-6">
+                <div class="px-4 space-y-2">
+                    <a href="dashboard.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="users.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Users
+                    </a>
+                    <a href="balances.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors sidebar-active text-white">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        Balances
+                    </a>
+                    <a href="payments.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                        Payments
+                    </a>
+                    <a href="transactions.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        Transactions
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-gray-800 shadow-sm border-b border-gray-700">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Balance Management</h2>
+                        <p class="text-sm text-gray-400">Monitor and update user balances</p>
+                    </div>
+                    <div class="flex items-center">
+                        <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Balances Content -->
+            <main class="p-6">
+                <div class="bg-gray-800 rounded-xl shadow-sm">
+                    <div class="p-6 border-b border-gray-700">
+                        <h3 class="text-lg font-semibold text-white">Balance Management</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-900">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Current Balance</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Updated</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-gray-800 divide-y divide-gray-700" id="balancesTableBody">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-white">John Doe</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">$2,540.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">2 hours ago</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-blue-400 hover:text-blue-300">Update Balance</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-white">Jane Smith</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">$1,250.75</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">1 day ago</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-blue-400 hover:text-blue-300">Update Balance</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
+    <script>
+        // Page-specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Balances page loading...');
+            
+            if (!AuthManager.isAuthenticated()) {
+                console.log('Not authenticated, redirecting to login');
+                window.location.href = '../auth/login.html';
+                return;
+            }
+            
+            // Load balances data
+            loadBalancesData();
+        });
+
+        // Load balances data
+        async function loadBalancesData() {
+            try {
+                const response = await APIClient.getAllUsers();
+                if (response && response.success) {
+                    renderBalancesTable(response.data);
+                }
+            } catch (error) {
+                console.error('Error loading balances:', error);
+                DashboardManager.showNotification('Error loading balances', 'error');
+            }
+        }
+
+        // Render balances table
+        function renderBalancesTable(users) {
+            const tbody = document.getElementById('balancesTableBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div>
+                                <div class="text-sm font-medium text-white">${user.firstName} ${user.lastName}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" id="balance-${user.id}">Loading...</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300" id="updated-${user.id}">Loading...</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-blue-400 hover:text-blue-300" onclick="updateBalance(${user.id})">Update Balance</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+                
+                // Load balance data for each user
+                loadUserBalance(user.id);
+            });
+        }
+
+        // Load user balance
+        async function loadUserBalance(userId) {
+            try {
+                const response = await APIClient.getUserBalance(userId);
+                if (response && response.success) {
+                    const balance = response.data;
+                    document.getElementById(`balance-${userId}`).textContent = `${balance.formatted}`;
+                    document.getElementById(`updated-${userId}`).textContent = new Date(balance.lastUpdated).toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error loading user balance:', error);
+                document.getElementById(`balance-${userId}`).textContent = 'Error loading';
+                document.getElementById(`updated-${userId}`).textContent = 'Error loading';
+            }
+        }
+
+        // Floating label functionality
+        function initFloatingLabels() {
+            document.querySelectorAll('.form-group input, .form-group select').forEach(input => {
+                const label = input.nextElementSibling;
+                
+                // Check if input has value on load
+                if (input.value || input.readOnly) {
+                    label.classList.add('active');
+                }
+                
+                if (input.readOnly) {
+                    label.classList.add('readonly');
+                }
+                
+                input.addEventListener('focus', () => {
+                    label.classList.add('active');
+                });
+                
+                input.addEventListener('blur', () => {
+                    if (!input.value && !input.readOnly) {
+                        label.classList.remove('active');
+                    }
+                });
+                
+                input.addEventListener('input', () => {
+                    if (input.value) {
+                        label.classList.add('active');
+                    } else if (!input.readOnly) {
+                        label.classList.remove('active');
+                    }
+                    
+                    // Update balance preview if it's the amount input
+                    if (input.id === 'newAmount') {
+                        updateBalancePreview();
+                    }
+                });
+            });
+        }
+
+        // Calculate balance difference
+        function updateBalancePreview() {
+            const currentAmount = parseFloat(document.getElementById('currentAmount').value) || 0;
+            const newAmount = parseFloat(document.getElementById('newAmount').value) || 0;
+            const currency = document.getElementById('currency').value;
+            const difference = newAmount - currentAmount;
+            
+            const previewElement = document.getElementById('balancePreview');
+            const diffElement = document.getElementById('balanceDiff');
+            
+            if (previewElement && diffElement) {
+                previewElement.textContent = formatCurrency(newAmount, currency);
+                
+                if (difference !== 0) {
+                    const sign = difference > 0 ? '+' : '';
+                    diffElement.textContent = `${sign}${formatCurrency(difference, currency)}`;
+                    diffElement.className = `balance-diff ${difference > 0 ? 'positive' : 'negative'}`;
+                    diffElement.style.display = 'inline';
+                } else {
+                    diffElement.style.display = 'none';
+                }
+            }
+        }
+
+        // Format currency
+        function formatCurrency(amount, currency) {
+            const symbols = { 'AZN': '₼', 'USD': '$', 'EUR': '€' };
+            return `${symbols[currency] || currency} ${amount.toFixed(2)}`;
+        }
+
+        // Set preset amount
+        function setPresetAmount(preset, currentAmount) {
+            const newAmountInput = document.getElementById('newAmount');
+            let newValue;
+            
+            // Remove active class from all presets
+            document.querySelectorAll('.amount-preset').forEach(p => p.classList.remove('active'));
+            
+            switch(preset) {
+                case '+10':
+                    newValue = currentAmount + 10;
+                    break;
+                case '+50':
+                    newValue = currentAmount + 50;
+                    break;
+                case '+100':
+                    newValue = currentAmount + 100;
+                    break;
+                case 'reset':
+                    newValue = 0;
+                    break;
+                default:
+                    return;
+            }
+            
+            newAmountInput.value = newValue.toFixed(2);
+            event.target.classList.add('active');
+            updateBalancePreview();
+        }
+
+        // Update balance function
+        async function updateBalance(userId) {
+            try {
+                const response = await APIClient.getUserBalance(userId);
+                if (response && response.success) {
+                    const balance = response.data;
+                    
+                    // Create enhanced balance update modal
+                    const modal = document.createElement('div');
+                    modal.className = 'fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4';
+                    modal.innerHTML = `
+                        <div class="relative bg-gray-800 shadow-2xl rounded-2xl w-full max-w-lg modal-content border border-gray-700" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            <!-- Header -->
+                            <div class="gradient-bg px-6 py-4 rounded-t-2xl">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-white">Update Balance</h3>
+                                            <p class="text-sm text-white text-opacity-80">Modify user account balance</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="closeModal()" class="text-white text-opacity-80 hover:text-white transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Form -->
+                            <form id="updateBalanceForm" class="p-6 space-y-6">
+                                <!-- Current Balance Card -->
+                                <div class="balance-card">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-white text-opacity-80">Current Balance</p>
+                                            <p class="text-2xl font-bold">${balance.formatted}</p>
+                                            <p class="text-xs text-white text-opacity-60 mt-1">Last updated: ${new Date(balance.lastUpdated).toLocaleDateString()}</p>
+                                        </div>
+                                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Balance Settings Section -->
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-300 mb-4 flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        Balance Configuration
+                                    </h4>
+                                    
+                                    <!-- Current Amount (Hidden) -->
+                                    <input type="hidden" id="currentAmount" value="${balance.amount}">
+                                    
+                                    <!-- Quick Actions -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Quick Actions</label>
+                                        <div class="flex space-x-2">
+                                            <button type="button" class="amount-preset" onclick="setPresetAmount('+10', ${balance.amount})">+$10</button>
+                                            <button type="button" class="amount-preset" onclick="setPresetAmount('+50', ${balance.amount})">+$50</button>
+                                            <button type="button" class="amount-preset" onclick="setPresetAmount('+100', ${balance.amount})">+$100</button>
+                                            <button type="button" class="amount-preset" onclick="setPresetAmount('reset', ${balance.amount})">Reset</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="form-group">
+                                            <input type="number" id="newAmount" value="${balance.amount}" step="0.01" min="0" class="w-full px-4 py-3 dark-input rounded-lg border-2 focus:outline-none" required>
+                                            <label class="floating-label active">New Amount</label>
+                                            <div class="input-icon">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <select id="currency" class="w-full px-4 py-3 dark-input rounded-lg border-2 focus:outline-none">
+                                                <option value="AZN" ${balance.currency === 'AZN' ? 'selected' : ''}>AZN (₼)</option>
+                                                <option value="USD" ${balance.currency === 'USD' ? 'selected' : ''}>USD ($)</option>
+                                                <option value="EUR" ${balance.currency === 'EUR' ? 'selected' : ''}>EUR (€)</option>
+                                            </select>
+                                            <label class="floating-label active">Currency</label>
+                                            <div class="input-icon">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Balance Preview -->
+                                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-gray-300">New Balance Preview</p>
+                                            <p class="text-xl font-bold text-white" id="balancePreview">${balance.formatted}</p>
+                                            <div class="balance-change">
+                                                <span class="balance-diff" id="balanceDiff" style="display: none;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="w-10 h-10 bg-green-500 bg-opacity-20 rounded-full flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-700">
+                                    <button type="button" onclick="closeModal()" class="px-6 py-2.5 btn-secondary text-white rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="px-6 py-2.5 btn-success text-white rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-green-500">
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            Update Balance
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    // Initialize floating labels and balance preview
+                    setTimeout(() => {
+                        initFloatingLabels();
+                        updateBalancePreview();
+                    }, 100);
+                    
+                    // Close modal when clicking backdrop
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            closeModal();
+                        }
+                    });
+                    
+                    // Handle currency change
+                    document.getElementById('currency').addEventListener('change', updateBalancePreview);
+                    
+                    // Handle form submission
+                    document.getElementById('updateBalanceForm').addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        
+                        const submitButton = e.target.querySelector('button[type="submit"]');
+                        const originalText = submitButton.innerHTML;
+                        
+                        // Show loading state
+                        submitButton.innerHTML = `
+                            <span class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Updating...
+                            </span>
+                        `;
+                        submitButton.disabled = true;
+                        
+                        const balanceData = {
+                            amount: parseFloat(document.getElementById('newAmount').value),
+                            currency: document.getElementById('currency').value
+                        };
+                        
+                        try {
+                            const updateResponse = await APIClient.updateBalance(userId, balanceData);
+                            if (updateResponse && updateResponse.success) {
+                                DashboardManager.showNotification('Balance updated successfully', 'success');
+                                loadBalancesData(); // Reload balances
+                                closeModal();
+                            }
+                        } catch (error) {
+                            console.error('Error updating balance:', error);
+                            DashboardManager.showNotification('Error updating balance', 'error');
+                        } finally {
+                            // Restore button state
+                            submitButton.innerHTML = originalText;
+                            submitButton.disabled = false;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading balance data:', error);
+                DashboardManager.showNotification('Error loading balance data', 'error');
+            }
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal-backdrop');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        }
+    </script>
+</body>
+</html>

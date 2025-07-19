@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Token Storage</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .info { background: #f0f8ff; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe6e6; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #e6ffe6; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Token Storage Debug</h1>
+    
+    <div id="results"></div>
+    
+    <button onclick="checkToken()">Check Token</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    <button onclick="testAPI()">Test API Call</button>
+    
+    <script>
+        // Authentication utilities (same as in admin.html)
+        class AuthManager {
+            static setToken(token) {
+                localStorage.setItem('adminToken', token);
+            }
+            
+            static getToken() {
+                return localStorage.getItem('adminToken');
+            }
+            
+            static removeToken() {
+                localStorage.removeItem('adminToken');
+            }
+            
+            static setUserData(userData) {
+                localStorage.setItem('adminUserData', JSON.stringify(userData));
+            }
+            
+            static getUserData() {
+                const userData = localStorage.getItem('adminUserData');
+                return userData ? JSON.parse(userData) : null;
+            }
+            
+            static clearUserData() {
+                localStorage.removeItem('adminUserData');
+            }
+            
+            static isAuthenticated() {
+                return !!this.getToken();
+            }
+        }
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        function checkToken() {
+            const token = AuthManager.getToken();
+            const userData = AuthManager.getUserData();
+            const isAuth = AuthManager.isAuthenticated();
+            
+            log('Token: ' + (token ? 'EXISTS (' + token.substring(0, 20) + '...)' : 'MISSING'));
+            log('User Data: ' + (userData ? JSON.stringify(userData) : 'MISSING'));
+            log('Is Authenticated: ' + isAuth);
+        }
+        
+        function clearStorage() {
+            AuthManager.removeToken();
+            AuthManager.clearUserData();
+            log('Storage cleared', 'success');
+        }
+        
+        async function testAPI() {
+            const token = AuthManager.getToken();
+            if (!token) {
+                log('No token found', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/admin/dashboard-stats', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log('API Response Status: ' + response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('API Success: ' + JSON.stringify(data), 'success');
+                } else {
+                    const error = await response.text();
+                    log('API Error: ' + error, 'error');
+                }
+            } catch (error) {
+                log('Network Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Auto-check on load
+        window.addEventListener('load', checkToken);
+    </script>
+</body>
+</html>

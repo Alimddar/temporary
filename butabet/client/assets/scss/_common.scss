@@ -1,0 +1,179 @@
+/* 1. Use a more-intuitive box-sizing model */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margin */
+* {
+  margin: 0;
+  list-style-type: none;
+   text-decoration: none;
+}
+
+li, ul {
+  list-style-type: none !important;
+  padding: 0;
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+/* 6. Improve media defaults */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root, #__next {
+  isolation: isolate;
+  list-style-type: none;
+}
+
+
+
+// ! CSS Color codes
+$background-c: #20202b;
+$text-yellow: #efc02c;
+
+// ! Animation
+@keyframes newAnimation {
+  from {
+    opacity: 0.6;
+    transform: scale(1) rotateZ(3deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05) rotateZ(4deg);
+  }
+}
+
+
+@mixin btn {
+  position: relative;
+  border: 0;
+  outline: 0;
+  text-align: center;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  background: $text-yellow;
+  color: #fff;
+  font-weight: 500;
+  height: 28px;
+  line-height: 3px;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-transition: -webkit-filter 120ms ease-in;
+  transition: -webkit-filter 120ms ease-in;
+  transition: filter 120ms ease-in;
+  transition: transform 0.2s;
+  transition: filter 120ms ease-in, -webkit-filter 120ms ease-in;
+  cursor: pointer;
+}
+
+@mixin input {
+  width: 120px;
+  height: 28px;
+  padding-left: 5px;
+  background-color: #272933;
+  transition: 0.4s ease border-color;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.041);
+  color: #fff;
+
+  &:focus {
+    border-color: #ccc;
+    outline: none;
+  }
+}
+
+@mixin select {
+    height: 40px;
+    padding-left: 15px;
+    outline: none;
+    border: none;
+    transition: 0.2s all;
+    border: 1px solid transparent;
+}
+
+
+@media (max-width: 500px) {
+  
+  .swiper-button-prev, .swiper-rtl .swiper-button-next {
+    display: none !important;
+  }
+  
+  .swiper-button-next, .swiper-rtl .swiper-button-prev {
+    display: none !important;
+  }
+}
+
+// ! SWIPER
+.swiper {
+  width: 100%;
+
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

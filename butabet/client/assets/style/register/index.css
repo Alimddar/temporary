@@ -1,0 +1,1178 @@
+/* 1. Use a more-intuitive box-sizing model */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margin */
+* {
+  margin: 0;
+  list-style-type: none;
+  text-decoration: none;
+}
+
+li, ul {
+  list-style-type: none !important;
+  padding: 0;
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+/* 6. Improve media defaults */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root, #__next {
+  isolation: isolate;
+  list-style-type: none;
+}
+
+@keyframes newAnimation {
+  from {
+    opacity: 0.6;
+    transform: scale(1) rotateZ(3deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05) rotateZ(4deg);
+  }
+}
+@media (max-width: 500px) {
+  .swiper-button-prev, .swiper-rtl .swiper-button-next {
+    display: none !important;
+  }
+  .swiper-button-next, .swiper-rtl .swiper-button-prev {
+    display: none !important;
+  }
+}
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+/* 1. Use a more-intuitive box-sizing model */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margin */
+* {
+  margin: 0;
+  list-style-type: none;
+  text-decoration: none;
+}
+
+li, ul {
+  list-style-type: none !important;
+  padding: 0;
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+/* 6. Improve media defaults */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root, #__next {
+  isolation: isolate;
+  list-style-type: none;
+}
+
+@keyframes newAnimation {
+  from {
+    opacity: 0.6;
+    transform: scale(1) rotateZ(3deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05) rotateZ(4deg);
+  }
+}
+@media (max-width: 500px) {
+  .swiper-button-prev, .swiper-rtl .swiper-button-next {
+    display: none !important;
+  }
+  .swiper-button-next, .swiper-rtl .swiper-button-prev {
+    display: none !important;
+  }
+}
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.overlay {
+  display: none;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(18, 22, 26, 0.56);
+  position: absolute;
+  z-index: 2;
+}
+.overlay.show {
+  display: block;
+}
+
+.nav-aside {
+  display: block;
+  background: #20202b;
+  top: 2px;
+  left: -100%;
+  width: 70%;
+  z-index: 995;
+  height: 100%;
+  overflow-y: scroll;
+  transition: 0.4s ease left;
+  position: absolute;
+}
+.nav-aside.active {
+  left: 0;
+}
+.nav-aside .wrapper {
+  padding: 20px;
+  color: #fff;
+}
+.nav-aside .wrapper .language-bar {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.nav-aside .wrapper .language-bar select {
+  width: 100%;
+  padding: 6px 0;
+}
+.nav-aside .wrapper .nav-list {
+  height: 100%;
+}
+.nav-aside .wrapper .nav-list li {
+  margin-bottom: 10px;
+}
+.nav-aside .wrapper .nav-list li.passive {
+  opacity: 0.5;
+}
+.nav-aside .wrapper .nav-list a {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+}
+.nav-aside .wrapper .nav-list a i {
+  color: #efc02c;
+}
+@media (min-width: 991px) {
+  .nav-aside {
+    display: none !important;
+  }
+}
+
+#header {
+  display: flex;
+  color: #fff;
+  padding: 10px 0;
+  background-color: #20202b;
+  flex-direction: column;
+}
+#header .mobile-part {
+  display: block;
+}
+@media (min-width: 991px) {
+  #header .mobile-part {
+    display: none !important;
+  }
+}
+#header .hero-part {
+  display: flex;
+  width: 99%;
+  justify-content: space-around;
+  margin: 15px 0;
+  margin-bottom: 7px;
+}
+@media (min-width: 1600px) {
+  #header .hero-part {
+    width: 85%;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 991px) {
+  #header .hero-part {
+    display: none;
+  }
+}
+#header .detail-part {
+  display: flex;
+  font-size: 15px;
+}
+#header .detail-part .clock {
+  margin-right: 12px;
+  font-size: 14px;
+}
+#header .detail-part .social-items {
+  margin-right: 16px;
+}
+#header .detail-part .social-items a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 5px;
+}
+#header .detail-part .social-items a i {
+  font-size: 1.2rem;
+}
+@media (min-width: 1600px) {
+  #header .detail-part .social-items a {
+    font-size: 1.4rem;
+  }
+}
+#header .detail-part .download-items {
+  display: flex;
+  gap: 12px;
+}
+@media (max-width: 1120px) {
+  #header .detail-part .detail-part {
+    font-size: 15px;
+  }
+  #header .detail-part .clock {
+    margin: 0;
+  }
+  #header .detail-part .social-items {
+    margin-right: 10px;
+  }
+}
+@media (max-width: 991px) {
+  #header .detail-part {
+    display: none;
+  }
+}
+#header .auth-part {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#header .auth-part .form-bar {
+  display: flex;
+  gap: 7px;
+  font-size: 14px;
+}
+#header .auth-part .form-bar .forgot-password {
+  margin-right: 8px;
+}
+#header .auth-part .form-bar .forgot-password a {
+  font-size: 14px;
+  color: #fff;
+}
+#header .auth-part .form-bar .btn-register {
+  position: relative;
+  border: 0;
+  outline: 0;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  background: #efc02c;
+  color: #fff;
+  font-weight: 500;
+  height: 28px;
+  line-height: 3px;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 120ms ease-in;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+#header .auth-part .form-bar .btn-register:hover {
+  background-color: rgb(219, 219, 57);
+}
+#header .auth-part .form-bar form {
+  display: flex;
+  gap: 7px;
+}
+#header .auth-part .form-bar form input {
+  width: 120px;
+  height: 28px;
+  padding-left: 5px;
+  background-color: #272933;
+  transition: 0.4s ease border-color;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.041);
+  color: #fff;
+}
+#header .auth-part .form-bar form input:focus {
+  border-color: #ccc;
+  outline: none;
+}
+#header .auth-part .form-bar form .btn-login {
+  position: relative;
+  border: 0;
+  outline: 0;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  background: #efc02c;
+  color: #fff;
+  font-weight: 500;
+  height: 28px;
+  line-height: 3px;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 120ms ease-in;
+  transition: transform 0.2s;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.041);
+  color: #fff;
+}
+#header .auth-part .form-bar form .btn-login:hover {
+  transform: scale(1.05);
+}
+#header .auth-part .isAuth.form-bar .account-information {
+  display: flex;
+  align-items: center;
+}
+#header .auth-part .isAuth.form-bar .account-information a {
+  color: #efc02c;
+}
+#header .auth-part .isAuth.form-bar .account-information a i {
+  font-size: 18px;
+}
+#header .auth-part .isAuth.form-bar .account-information span {
+  background-color: #2d2d36;
+  padding: 8px;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+#header .auth-part .isAuth.form-bar .button-group {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+#header .auth-part .isAuth.form-bar .button-group a {
+  position: relative;
+  border: 0;
+  outline: 0;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  background: #efc02c;
+  color: #fff;
+  font-weight: 500;
+  height: 28px;
+  line-height: 3px;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 120ms ease-in;
+  transition: transform 0.2s;
+  cursor: pointer;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+#header .auth-part .isAuth.form-bar .button-group a:hover {
+  transform: scale(1.05);
+}
+#header .auth-part .isAuth.form-bar .button-group a.account {
+  background: #dfe6e8;
+  color: #000;
+}
+#header .auth-part .isAuth.form-bar .button-group a i {
+  margin-right: 12px;
+}
+#header .auth-part .isAuth.form-bar .button-group .sign-out {
+  border: none;
+  cursor: pointer;
+  background-color: #2d2d36;
+  transition: 0.2s all;
+}
+#header .auth-part .isAuth.form-bar .button-group .sign-out:hover {
+  opacity: 0.7;
+}
+#header .auth-part .isAuth.form-bar .button-group .sign-out i {
+  color: #fff;
+  padding: 4px;
+  border-radius: 3px;
+}
+#header .auth-part .language-bar {
+  gap: 10px;
+  cursor: pointer;
+}
+#header .auth-part .language-bar span {
+  margin-right: 5px;
+}
+#header .auth-part .language-bar img {
+  display: inline;
+  transform: scale(1.1);
+}
+@media (max-width: 991px) {
+  #header .auth-part {
+    display: none;
+  }
+}
+#header .nav-part {
+  display: flex;
+  margin: 0 auto;
+  justify-content: space-between;
+  align-items: center;
+  width: 85%;
+}
+@media (max-width: 1120px) {
+  #header .nav-part {
+    width: 100% !important;
+  }
+}
+@media (max-width: 991px) {
+  #header .nav-part {
+    display: none;
+  }
+}
+#header .banner {
+  cursor: pointer;
+}
+#header nav ul li {
+  display: inline-block;
+  margin-right: 18px;
+  position: relative;
+}
+#header nav ul li a.link {
+  font-family: "Oswald", sans-serif;
+  font-size: 14px;
+  display: inline-block;
+  color: #fff;
+  transition: color 80ms ease-in;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+#header nav ul li a.link:hover {
+  color: #efc02c;
+}
+#header nav ul li span {
+  position: absolute;
+  top: -10px;
+  right: -11px;
+  color: #fff;
+  background: red;
+  font-size: 9px;
+  height: 16px;
+  line-height: normal;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.625rem;
+  animation: newAnimation 0.3s infinite alternate;
+  pointer-events: none;
+}
+#header nav ul li .jetX {
+  transform: translateY(10px);
+}
+
+#header .mobile-part {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 7px;
+}
+#header .menu-icon {
+  display: flex;
+  position: relative;
+  z-index: 99;
+  align-items: center;
+  gap: 10px;
+}
+#header .menu-icon i {
+  font-size: 28px;
+}
+#header .logo-banner {
+  margin-right: 20px;
+}
+#header .content {
+  display: flex;
+  align-items: center;
+}
+#header .content .chat-banner {
+  margin-right: 12px;
+}
+#header .content .chat-banner i {
+  font-size: 28px;
+  color: #efc02c;
+}
+#header .content .btn-groups a.btn {
+  position: relative;
+  border: 0;
+  outline: 0;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  background: #efc02c;
+  color: #fff;
+  font-weight: 500;
+  height: 28px;
+  line-height: 3px;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 120ms ease-in;
+  transition: transform 0.2s;
+  cursor: pointer;
+  margin-right: 12px;
+  padding: 17px 7px;
+}
+#header .content .btn-groups a.btn.btn-login {
+  background-color: #fff;
+  color: #000;
+}
+@media (max-width: 460px) {
+  #header .menu-icon i {
+    font-size: 20px;
+  }
+  #header .content .chat-banner i {
+    font-size: 20px;
+  }
+  #header .content .btn-groups a.btn {
+    font-size: 13px;
+    height: 22px;
+    margin-right: 5px;
+    padding: 14px 5px;
+  }
+  #header .logo-banner img {
+    width: 100px;
+    height: 26px;
+  }
+}
+@media (max-width: 375px) {
+  #header .menu-icon i {
+    font-size: 18px;
+  }
+  #header .content .chat-banner i {
+    font-size: 19px;
+  }
+  #header .content .btn-groups a.btn {
+    font-size: 11px;
+    height: 20px;
+    margin-right: 3px;
+    padding: 12px 5px;
+  }
+  #header .logo-banner img {
+    width: 100px;
+    height: 26px;
+  }
+}
+
+/* 1. Use a more-intuitive box-sizing model */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margin */
+* {
+  margin: 0;
+  list-style-type: none;
+  text-decoration: none;
+}
+
+li, ul {
+  list-style-type: none !important;
+  padding: 0;
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+/* 6. Improve media defaults */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root, #__next {
+  isolation: isolate;
+  list-style-type: none;
+}
+
+@keyframes newAnimation {
+  from {
+    opacity: 0.6;
+    transform: scale(1) rotateZ(3deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05) rotateZ(4deg);
+  }
+}
+@media (max-width: 500px) {
+  .swiper-button-prev, .swiper-rtl .swiper-button-next {
+    display: none !important;
+  }
+  .swiper-button-next, .swiper-rtl .swiper-button-prev {
+    display: none !important;
+  }
+}
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+footer {
+  background-color: #20202b;
+  border-top: 5px solid red;
+  padding: 30px 0;
+}
+
+footer .wrapper {
+  width: 90%;
+  margin: 0 auto;
+}
+
+footer .wrapper .menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+footer .wrapper .menu nav {
+  display: flex;
+  flex: 4;
+}
+footer .wrapper .menu .logo-content {
+  flex: 1;
+}
+
+footer .wrapper .menu .main {
+  display: flex;
+  width: 100%;
+}
+footer .wrapper .menu .main li {
+  flex: 1;
+}
+footer .wrapper .menu .main li span {
+  color: #efc02c;
+}
+footer .wrapper .menu .main li ul li {
+  margin-top: 5px;
+}
+footer .wrapper .menu .main li ul li a {
+  color: #fff;
+  font-size: 13px;
+  transition: 0.3s all;
+}
+footer .wrapper .menu .main li ul li a:hover {
+  color: #efc02c;
+}
+
+@media (max-width: 1024px) {
+  footer .wrapper .menu {
+    display: none;
+  }
+}
+footer .cards-content {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+footer .cards-content .part__1 {
+  display: flex;
+  gap: 20px;
+}
+footer .cards-content .part__2 {
+  display: flex;
+  gap: 20px;
+}
+footer .cards-content .part__2 img {
+  height: 21px;
+}
+
+@media (max-width: 991px) {
+  footer .cards-content {
+    flex-direction: column;
+  }
+  footer .cards-content .part__2 {
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+}
+footer .partnership-content {
+  display: flex;
+  margin-top: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+footer .partnership-content img {
+  width: 81px;
+  margin-right: 5px;
+  height: 31px;
+}
+
+footer .copyright-content {
+  display: flex;
+  margin: 25px;
+  justify-content: space-between;
+  align-items: center;
+}
+footer .copyright-content .download {
+  display: flex;
+  align-items: center;
+}
+footer .copyright-content span {
+  color: #efc02c;
+}
+footer .copyright-content .social-items {
+  margin-right: 16px;
+}
+footer .copyright-content .social-items a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 5px;
+}
+footer .copyright-content .social-items a i {
+  font-size: 1.2rem;
+}
+@media (min-width: 1600px) {
+  footer .copyright-content .social-items a {
+    font-size: 1.4rem;
+  }
+}
+footer .copyright-content .download-items {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 991px) {
+  footer .copyright-content span {
+    font-size: 13px;
+  }
+  footer .copyright-content .download {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+header {
+  background-color: #1d1d26;
+}
+
+body {
+  background: #20202b;
+  font-size: 15px;
+}
+
+#register-container {
+  width: 86%;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  background: #e8e8e8;
+  margin-bottom: 20px;
+}
+
+#register-container .register .container {
+  padding: 30px;
+}
+
+.register .content-title {
+  padding: 5px;
+  color: #fff;
+  border-radius: 2px;
+  background-color: #efc02c;
+}
+
+.container .wrapper form {
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
+}
+.container .wrapper form .my-information {
+  flex: 1;
+}
+.container .wrapper form .my-account {
+  flex: 1;
+}
+
+form .my-information .title {
+  text-align: center;
+  line-height: 100px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+form .my-account .title {
+  text-align: center;
+  line-height: 100px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.input-groups .input-content {
+  margin-bottom: 7px;
+}
+
+.input-groups .input-content label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.input-groups .input-content label span {
+  flex: 1;
+  font-size: 14px;
+}
+.input-groups .input-content label input {
+  flex: 2;
+  height: 40px;
+  padding-left: 15px;
+  outline: none;
+  border: none;
+  transition: 0.2s all;
+  border: 1px solid transparent;
+}
+.input-groups .input-content label input.iscorrect {
+  border: 1px solid red;
+}
+.input-groups .input-content label select {
+  height: 40px;
+  padding-left: 15px;
+  outline: none;
+  border: none;
+  transition: 0.2s all;
+  border: 1px solid transparent;
+}
+
+@media (max-width: 991px) {
+  #register-container {
+    width: 95%;
+    background-color: transparent;
+  }
+  #register-container .register .container {
+    padding: 20px;
+  }
+  .container .wrapper form {
+    gap: 20px;
+  }
+  form .my-information .title {
+    display: none;
+  }
+  form .my-account .title {
+    display: none;
+  }
+  .input-content label input,
+  select {
+    border-radius: 7px;
+  }
+  .input-content label span {
+    display: none;
+  }
+  .container .wrapper .agreement {
+    width: 80%;
+    margin-left: auto;
+  }
+}
+@media (max-width: 768px) {
+  .register .content-title {
+    text-align: center;
+    font-size: 17px;
+  }
+  .container .wrapper form {
+    flex-direction: column;
+  }
+}
+.input-groups .input-content .msg {
+  text-align: right;
+  color: red;
+  display: block;
+  font-size: 12px;
+  transition: 0.2s all;
+  opacity: 0;
+  visibility: hidden;
+}
+.input-groups .input-content .msg.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.input-groups .content-3 .group {
+  display: flex;
+  gap: 15px;
+  flex: 2;
+}
+.input-groups .content-3 .group select {
+  flex: 1;
+  height: 40px;
+  padding-left: 15px;
+  outline: none;
+  border: none;
+  transition: 0.2s all;
+  border: 1px solid transparent;
+}
+
+.input-groups .content-5 .group {
+  display: flex;
+  gap: 10px;
+  flex: 2;
+}
+.input-groups .content-5 .group select {
+  flex: 1;
+  height: 40px;
+  padding-left: 15px;
+  outline: none;
+  border: none;
+  transition: 0.2s all;
+  border: 1px solid transparent;
+}
+.input-groups .content-5 .group input {
+  flex: 3;
+}
+
+.my-account .content-2 span {
+  flex: 1;
+}
+.my-account .content-2 select {
+  flex: 2;
+}
+
+.container .wrapper .agreement {
+  text-align: right;
+  margin-top: 30px;
+}
+@media (max-width: 475px) {
+  .container .wrapper .agreement {
+    width: 100%;
+    margin: auto;
+    text-align: left;
+  }
+}
+.container .wrapper .agreement a {
+  color: #000;
+  font-size: 15px;
+}
+@media (max-width: 991px) {
+  .container .wrapper .agreement a {
+    color: #fff;
+  }
+}
+@media (max-width: 500px) {
+  .container .wrapper .agreement a {
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+.container .wrapper .btn-content {
+  margin-top: 34px;
+  display: flex;
+  justify-content: flex-end;
+}
+.container .wrapper .btn-content button {
+  position: relative;
+  border: 0;
+  outline: 0;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  background: #efc02c;
+  color: #fff;
+  font-weight: 500;
+  height: 28px;
+  line-height: 3px;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 120ms ease-in;
+  transition: transform 0.2s;
+  cursor: pointer;
+  width: 230px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 15px;
+  font-weight: 700;
+}
+@media (max-width: 500px) {
+  .container .wrapper .btn-content button {
+    width: 100%;
+  }
+}
+.container .wrapper .btn-content button:hover {
+  transform: scale(1.03);
+}/*# sourceMappingURL=index.css.map */

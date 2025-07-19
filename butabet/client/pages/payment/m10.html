@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M10 Transfer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 18px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 32px 28px;
+            text-align: center;
+        }
+
+        .qr-section {
+            margin-bottom: 24px;
+        }
+
+        .qr-code {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 16px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+        }
+
+        .qr-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .copy-button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #333;
+        }
+
+        .account-section {
+            margin: 32px 0 24px;
+        }
+
+        .account-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e8e8e8;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4aa, #00b894);
+            width: 100%;
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s ease;
+            background: white;
+            color: #333;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .form-input::placeholder {
+            color: #aaa;
+            font-weight: 400;
+        }
+
+        .phone-input {
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin: 24px 0;
+            padding: 32px 20px;
+            border: 2px dashed #d0d0d0;
+            border-radius: 12px;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-section:hover {
+            border-color: #4285f4;
+            background: #f8f9ff;
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background: #4285f4;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .upload-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .upload-subtitle {
+            font-size: 14px;
+            color: #777;
+            line-height: 1.4;
+        }
+
+        .amount-section {
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .amount-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .amount-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: #3367d6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            min-width: 300px;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            border-left: 4px solid #00d4aa;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #00d4aa;
+        }
+
+        .toast.error {
+            border-left-color: #ff4757;
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon {
+            background: #00d4aa;
+        }
+
+        .toast.error .toast-icon {
+            background: #ff4757;
+        }
+
+        .toast-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: white;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .toast-close:hover {
+            background: #f5f5f5;
+        }
+
+        @media (max-width: 480px) {
+            .toast-container {
+                left: 20px;
+                right: 20px;
+                top: 20px;
+            }
+
+            .toast {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .container {
+                margin: 0 10px;
+            }
+            
+            .content {
+                padding: 24px 20px;
+            }
+            
+            .qr-code {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .account-number {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <div class="header">
+            M10 TRANSFER
+        </div>
+        
+        <div class="content">
+            <div class="qr-section">
+                <div class="qr-code">
+                    <img src="../../assets/images/qr-codes/m10-qr.svg" alt="M10 QR Code for account 4286521613332334">
+                </div>
+                <div class="qr-description">
+                    QR vasitəsilə və ya düyməyə klikləyərək<br>
+                    M10 nömrəsini əldə edib depozit edə bilərsəniz.
+                </div>
+                <button class="copy-button">Hesab Nömrəsini Kopyalayın</button>
+            </div>
+
+            <div class="account-section">
+                <div class="account-number" id="accountNumber">----------------</div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+            <form id="m10DepositForm">
+                <div class="form-group">
+                    <label class="form-label">Məbləğ (AZN)</label>
+                    <input type="number" class="form-input" id="depositAmount" placeholder="10.00" min="10" max="10000" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Göndərən Hesab Nömrəsi</label>
+                    <input type="tel" class="form-input" id="senderAccount" value="+994" placeholder="+994XXXXXXXXX" maxlength="13" required>
+                </div>
+
+                <div class="upload-section" id="uploadSection">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        </svg>
+                    </div>
+                    <div class="upload-title">Qəbzin Yükləmə Sahəsi (İstəyə bağlı)</div>
+                    <div class="upload-subtitle" id="uploadSubtitle">Bu sahəyə sürükləyin və ya seçim üçün kliklayın (məcburi deyil)</div>
+                    <input type="file" id="receiptFile" accept="image/*,.pdf" style="display: none;">
+                </div>
+
+                <div class="amount-section">
+                    <div class="amount-label">Ödəniləcək Məbləğ</div>
+                    <div class="amount-value" id="displayAmount">AZN 0.00</div>
+                </div>
+
+                <div id="errorMessage" style="color: red; text-align: center; margin: 10px 0; display: none;"></div>
+
+                <button type="submit" class="submit-btn">
+                    Təsdiqləyin və Davam edin
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let currentAccountNumber = '';
+        let paymentAccountId = null;
+        
+        // Toast Notification System
+        function showToast(type, title, message, duration = 5000) {
+            const toastContainer = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const iconSvg = type === 'success' 
+                ? '<svg viewBox="0 0 24 24"><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/></svg>'
+                : '<svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${iconSvg}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        
+        // Function to fetch payment account details
+        async function fetchPaymentAccount() {
+            try {
+                console.log('M10: Starting to fetch payment account...');
+                
+                // Fetch payment methods first to get the ID
+                console.log('M10: Fetching payment methods...');
+                const methodsResponse = await fetch(`${API_BASE_URL}/payment/methods`);
+                const methodsData = await methodsResponse.json();
+                console.log('M10: Payment methods response:', methodsData);
+                
+                if (methodsData.success) {
+                    const m10Method = methodsData.data.find(method => method.name === 'm10');
+                    if (m10Method) {
+                        console.log('M10: Found method with name:', m10Method.name);
+                    }
+                }
+                
+                // Try multiple API endpoints to fetch account details
+                console.log('M10: Fetching account details...');
+                let accountData = null;
+                
+                // Try the specific method endpoint first
+                try {
+                    const response = await fetch(`${API_BASE_URL}/payment/method/m10/account`);
+                    const data = await response.json();
+                    console.log('M10: Account details response from method endpoint:', data);
+                    if (data.success && data.data) {
+                        accountData = data.data;
+                    }
+                } catch (error) {
+                    console.log('M10: Method endpoint failed, trying alternative:', error);
+                }
+                
+                // If the method endpoint failed, try the accounts endpoint
+                if (!accountData) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/payment/accounts`);
+                        const data = await response.json();
+                        console.log('M10: Accounts response:', data);
+                        if (data.success && data.data) {
+                            // Find the m10 account
+                            accountData = data.data.find(account => 
+                                (account.paymentMethod && account.paymentMethod.name === 'm10')
+                            );
+                            console.log('M10: Found account from accounts endpoint:', accountData);
+                        }
+                    } catch (error) {
+                        console.log('M10: Accounts endpoint also failed:', error);
+                    }
+                }
+                
+                // Update UI with account data
+                if (accountData) {
+                    // Store the payment account ID for transaction creation
+                    paymentAccountId = accountData.id;
+                    console.log('M10: Found payment account with ID:', paymentAccountId);
+                    
+                    const accountNumberElement = document.getElementById('accountNumber');
+                    console.log('M10: Account number element:', accountNumberElement);
+                    
+                    // Try different possible property names for account number
+                    const possibleAccountNumbers = [
+                        accountData.accountDetails?.accountNumber,
+                        accountData.accountNumber,
+                        accountData.details?.accountNumber,
+                        accountData.phoneNumber,
+                        accountData.accountDetails?.phoneNumber
+                    ];
+                    
+                    const accountNumber = possibleAccountNumbers.find(num => num);
+                    
+                    if (accountNumber) {
+                        currentAccountNumber = accountNumber;
+                        console.log('M10: Setting account number to:', currentAccountNumber);
+                        accountNumberElement.textContent = currentAccountNumber;
+                        console.log('M10: Account number updated successfully');
+                    } else {
+                        console.log('M10: No account number found in data:', accountData);
+                    }
+                } else {
+                    console.log('M10: No account data found');
+                }
+            } catch (error) {
+                console.error('M10: Error fetching payment account:', error);
+                // Keep default placeholder values on error
+            }
+        }
+        
+        // Update display amount when user enters amount
+        document.getElementById('depositAmount').addEventListener('input', function(e) {
+            const amount = parseFloat(e.target.value) || 0;
+            document.getElementById('displayAmount').textContent = `AZN ${amount.toFixed(2)}`;
+        });
+
+        // Also trigger on page load if there's a default value
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInput = document.getElementById('depositAmount');
+            if (amountInput.value) {
+                const amount = parseFloat(amountInput.value) || 0;
+                document.getElementById('displayAmount').textContent = `AZN ${amount.toFixed(2)}`;
+            }
+        });
+        
+        // Handle phone number input
+        document.getElementById('senderAccount').addEventListener('input', function(e) {
+            let value = e.target.value;
+            
+            // Always ensure it starts with +994
+            if (!value.startsWith('+994')) {
+                value = '+994';
+                e.target.value = value;
+                // Set cursor position after +994
+                setTimeout(() => {
+                    e.target.setSelectionRange(4, 4);
+                }, 0);
+                return;
+            }
+            
+            // Remove any non-digit characters except the + at the beginning
+            const digitsOnly = value.slice(4).replace(/\D/g, '');
+            value = '+994' + digitsOnly;
+            
+            // Limit to reasonable phone number length (+994 + 9 digits = 13 chars)
+            if (value.length > 13) {
+                value = value.slice(0, 13);
+            }
+            
+            e.target.value = value;
+        });
+        
+        // Prevent deleting +994 prefix
+        document.getElementById('senderAccount').addEventListener('keydown', function(e) {
+            const cursorPos = e.target.selectionStart;
+            const cursorEnd = e.target.selectionEnd;
+            
+            if ((e.key === 'Backspace' || e.key === 'Delete') && cursorPos <= 4) {
+                e.preventDefault();
+                return;
+            }
+            
+            // Allow typing after +994
+            if (cursorPos < 4 && e.key.length === 1 && /\d/.test(e.key)) {
+                e.preventDefault();
+                e.target.setSelectionRange(4, 4);
+                e.target.value = e.target.value.substring(0, 4) + e.key + e.target.value.substring(4);
+                e.target.setSelectionRange(5, 5);
+            }
+        });
+        
+        // Set initial cursor position after +994
+        document.getElementById('senderAccount').addEventListener('focus', function(e) {
+            if (e.target.value === '+994') {
+                setTimeout(() => {
+                    e.target.setSelectionRange(4, 4);
+                }, 0);
+            }
+        });
+        
+        // File upload handling
+        document.getElementById('uploadSection').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('receiptFile').click();
+        });
+        
+        document.getElementById('receiptFile').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                document.getElementById('uploadSubtitle').textContent = `Seçildi: ${fileName}`;
+                document.getElementById('uploadSection').style.borderColor = '#007bff';
+                document.getElementById('uploadSection').style.backgroundColor = '#f0f8ff';
+            }
+        });
+        
+        // Show error message
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        // Hide error message
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+        
+        // Form submission handler
+        document.getElementById('m10DepositForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideError();
+            
+            // Get form data
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            const senderAccount = document.getElementById('senderAccount').value.trim();
+            const receiptFile = document.getElementById('receiptFile').files[0];
+            
+            // Validate form
+            if (!amount || amount < 10 || amount > 10000) {
+                showError('Məbləğ 10 AZN ilə 10000 AZN arasında olmalıdır');
+                return;
+            }
+            
+            if (!senderAccount || senderAccount.length !== 13 || !senderAccount.startsWith('+994')) {
+                showError('Göndərən hesab nömrəsi +994XXXXXXXXX formatında olmalıdır');
+                return;
+            }
+            
+            // Receipt upload is now optional
+            // if (!receiptFile) {
+            //     showError('Xahiş edirik ödəniş qəbzini yükləyin');
+            //     return;
+            // }
+            
+            if (!paymentAccountId) {
+                showToast('error', 'Sistem Xətası', 'Ödəniş hesabı tapılmadı');
+                return;
+            }
+            
+            try {
+                // Get authentication token
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    showError('Xahiş edirik giriş edin');
+                    window.location.href = '../user/index.html';
+                    return;
+                }
+                
+                // Upload receipt if provided (optional)
+                let receiptPath = null;
+                if (receiptFile) {
+                    const receiptFormData = new FormData();
+                    receiptFormData.append('receipt', receiptFile);
+                    
+                    const receiptResponse = await fetch(`${API_BASE_URL}/payment/upload-receipt`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: receiptFormData
+                    });
+                    
+                    const receiptResult = await receiptResponse.json();
+                    if (receiptResult.success) {
+                        receiptPath = receiptResult.data.filename;
+                    } else {
+                        // Don't fail the transaction if receipt upload fails
+                        console.warn('Receipt upload failed:', receiptResult.message);
+                    }
+                }
+                
+                // Create transaction
+                const transactionData = {
+                    paymentAccountId: paymentAccountId,
+                    amount: amount,
+                    senderAccount: senderAccount
+                };
+                
+                // Add receipt path if available
+                if (receiptPath) {
+                    transactionData.receiptPath = receiptPath;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/payment/deposit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(transactionData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('success', 'Uğurla Tamamlandı', 'Ödəniş uğurla tamamlandı');
+                    
+                    // Redirect after a short delay to let user see the toast
+                    setTimeout(() => {
+                        window.location.href = '../debug/tmp.html';
+                    }, 2000);
+                } else {
+                    showToast('error', 'Tamamlana Bilmədi', result.message || 'Xəta baş verdi');
+                }
+            } catch (error) {
+                console.error('Transaction creation error:', error);
+                showToast('error', 'Tamamlana Bilmədi', 'Bağlantı xətası. Xahiş edirik yenidən cəhd edin.');
+            }
+        });
+        
+        // Fetch payment account details when page loads
+        document.addEventListener('DOMContentLoaded', fetchPaymentAccount);
+        
+        // Copy account number functionality
+        document.querySelector('.copy-button').addEventListener('click', function() {
+            const accountNumber = currentAccountNumber || document.getElementById('accountNumber').textContent;
+            navigator.clipboard.writeText(accountNumber).then(function() {
+                const button = document.querySelector('.copy-button');
+                const originalText = button.textContent;
+                button.textContent = 'Kopyalandı!';
+                button.style.background = '#00b894';
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.style.background = '#000';
+                }, 2000);
+            });
+        });
+
+    </script>
+</body>
+</html>

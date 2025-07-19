@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISA/MASTERCARD Payment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0f0f0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 18px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 32px 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+            color: #333;
+            appearance: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #aaa;
+            font-weight: 400;
+        }
+
+        .dropdown-wrapper {
+            position: relative;
+        }
+
+        .dropdown-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+            font-size: 12px;
+        }
+
+        .card-details {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .card-number {
+            flex: 2;
+        }
+
+        .card-expiry {
+            flex: 1;
+        }
+
+        .card-cvv {
+            flex: 1;
+        }
+
+        .card-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 4px;
+            margin-bottom: 16px;
+        }
+
+        .amount-section {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        .amount-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .amount-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+            margin-bottom: 24px;
+        }
+
+        .submit-btn:hover {
+            background: #3367d6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .payment-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .payment-logo {
+            height: 32px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            min-width: 50px;
+        }
+
+        .visa { background: #1a1f71; }
+        .mastercard { background: linear-gradient(90deg, #eb001b, #ff5f00); }
+        .discover { background: #ff6000; }
+        .amex { background: #006fcf; }
+        .paypal { background: #003087; }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            min-width: 300px;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            border-left: 4px solid #00d4aa;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #00d4aa;
+        }
+
+        .toast.error {
+            border-left-color: #ff4757;
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon {
+            background: #00d4aa;
+        }
+
+        .toast.error .toast-icon {
+            background: #ff4757;
+        }
+
+        .toast-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: white;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .toast-close:hover {
+            background: #f5f5f5;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 0 10px;
+            }
+            
+            .content {
+                padding: 24px 20px;
+            }
+            
+            .card-details {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            /* Mobile Responsive for Toast */
+            .toast-container {
+                left: 20px;
+                right: 20px;
+                top: 20px;
+            }
+
+            .toast {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <div class="brand-title">Betbuta</div>
+    
+    <div class="container">
+        <div class="header">
+            VISA / MASTERCARD
+        </div>
+        
+        <div class="content">
+            <form id="visaPaymentForm">
+                <div class="form-group">
+                    <div class="dropdown-wrapper">
+                        <select class="form-select" id="bankSelect" required>
+                            <option value="unibank">Unibank</option>
+                            <option value="azar-turk">Azər Türk Bank</option>
+                            <option value="pasa">PASA Bank</option>
+                            <option value="express">Express Bank</option>
+                            <option value="bank-respublika">Bank Respublika</option>
+                            <option value="bank-of-baku">Bank of Baku</option>
+                            <option value="yelo">YeloBank</option>
+                            <option value="gunay">Gunay Bank</option>
+                            <option value="kapital">Kapital Bank</option>
+                            <option value="access">Access Bank</option>
+                            <option value="rabitabank">RabiteBank</option>
+                            <option value="premium">Premium Bank</option>
+                            <option value="turanbank">TuranBank</option>
+                            <option value="azer-gold">Azər-Türk Bank</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="number" class="form-input" id="amount" placeholder="Məbləğ (AZN)" min="5" max="10000" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-input" id="cardHolder" placeholder="Kart Sahibi" required>
+                </div>
+
+                <div class="form-group">
+                    <div class="card-details">
+                        <div class="card-number input-wrapper">
+                            <input type="text" class="form-input" id="cardNumber" placeholder="Kart nömrəsi" maxlength="19" required>
+                            <div class="card-icon">💳</div>
+                        </div>
+                        <div class="card-expiry">
+                            <input type="text" class="form-input" id="expiry" placeholder="AY/İL" maxlength="5" required>
+                        </div>
+                        <div class="card-cvv">
+                            <input type="text" class="form-input" id="cvv" placeholder="CVV" maxlength="3" required>
+                        </div>
+                    </div>
+                    <div class="error-message" id="errorMessage" style="display: none;"></div>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+                    <input type="checkbox" id="saveCard" style="width: auto; margin: 0;">
+                    <label for="saveCard" style="margin: 0; font-size: 14px; color: #555; cursor: pointer;">Kart məlumatlarını təhlükəsiz saxla</label>
+                </div>
+
+                <div class="amount-section">
+                    <div class="amount-label">Ödəniləcək Məbləğ</div>
+                    <div class="amount-value" id="displayAmount">AZN 0.00</div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Təsdiqləyin və Davam edin
+                </button>
+
+                <div class="payment-logos">
+                    <div class="payment-logo visa">VISA</div>
+                    <div class="payment-logo mastercard">MC</div>
+                    <div class="payment-logo discover">DISC</div>
+                    <div class="payment-logo amex">AMEX</div>
+                    <div class="payment-logo paypal">PayPal</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        // Toast Notification System
+        function showToast(type, title, message, duration = 5000) {
+            const toastContainer = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const iconSvg = type === 'success' 
+                ? '<svg viewBox="0 0 24 24"><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/></svg>'
+                : '<svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${iconSvg}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        
+        // Format card number input (limit to 16 digits)
+        const cardNumberInput = document.getElementById('cardNumber');
+        cardNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove all non-digits
+            
+            // Limit to exactly 16 digits
+            if (value.length > 16) {
+                value = value.slice(0, 16);
+            }
+            
+            // Format with spaces every 4 digits
+            let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = formattedValue;
+        });
+
+        // Format expiry date input
+        const expiryInput = document.getElementById('expiry');
+        expiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Only allow numbers in CVV
+        const cvvInput = document.getElementById('cvv');
+        cvvInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+
+        // Update display amount when user enters amount
+        document.getElementById('amount').addEventListener('input', function(e) {
+            const amount = parseFloat(e.target.value) || 0;
+            document.getElementById('displayAmount').textContent = `AZN ${amount.toFixed(2)}`;
+        });
+
+        // Also trigger on page load if there's a default value
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInput = document.getElementById('amount');
+            if (amountInput.value) {
+                const amount = parseFloat(amountInput.value) || 0;
+                document.getElementById('displayAmount').textContent = `AZN ${amount.toFixed(2)}`;
+            }
+        });
+
+        // Card validation functions
+        function validateCardNumber(cardNumber) {
+            const cleaned = cardNumber.replace(/\s/g, '');
+            return cleaned.length === 16 && /^\d+$/.test(cleaned);
+        }
+
+        function validateExpiry(expiry) {
+            const pattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            if (!pattern.test(expiry)) return false;
+            
+            const [month, year] = expiry.split('/');
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear() % 100;
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            const expiryYear = parseInt(year);
+            const expiryMonth = parseInt(month);
+            
+            if (expiryYear < currentYear || (expiryYear === currentYear && expiryMonth < currentMonth)) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        function validateCVV(cvv) {
+            return cvv.length >= 3 && cvv.length <= 4 && /^\d+$/.test(cvv);
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError() {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.style.display = 'none';
+        }
+
+        // Form submission handler
+        document.getElementById('visaPaymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideError();
+
+            const amount = parseFloat(document.getElementById('amount').value);
+            const formData = {
+                bankSelect: document.getElementById('bankSelect').value,
+                cardHolder: document.getElementById('cardHolder').value.trim(),
+                cardNumber: document.getElementById('cardNumber').value.replace(/\s/g, ''),
+                expiry: document.getElementById('expiry').value,
+                cvv: document.getElementById('cvv').value,
+                amount: amount,
+                saveCard: document.getElementById('saveCard').checked
+            };
+
+            // Validate form data
+            if (!amount || amount < 5 || amount > 10000) {
+                showToast('error', 'Yanlış Məbləğ', 'Məbləğ 5 AZN ilə 10000 AZN arasında olmalıdır');
+                return;
+            }
+
+            if (!formData.cardHolder) {
+                showToast('error', 'Kart Sahibi Tələb Olunur', 'Kart sahibinin adını daxil edin');
+                return;
+            }
+
+            if (!validateCardNumber(formData.cardNumber)) {
+                showToast('error', 'Etibarsız Kart Nömrəsi', 'Kart nömrəsi etibarsızdır');
+                return;
+            }
+
+            if (!validateExpiry(formData.expiry)) {
+                showToast('error', 'Etibarsız Tarix', 'Kart vaxtı etibarsızdır və ya keçmişdədir');
+                return;
+            }
+
+            if (!validateCVV(formData.cvv)) {
+                showToast('error', 'Etibarsız CVV', 'CVV kodu etibarsızdır');
+                return;
+            }
+
+            try {
+                // Get authentication token
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    showToast('error', 'Giriş Tələb Olunur', 'Xahiş edirik giriş edin');
+                    return;
+                }
+
+                // Prepare payment data
+                const paymentData = {
+                    paymentMethodName: 'visa',
+                    amount: formData.amount,
+                    cardData: {
+                        cardNumber: formData.cardNumber,
+                        cardHolder: formData.cardHolder,
+                        expiry: formData.expiry,
+                        cvv: formData.cvv,
+                        bank: formData.bankSelect
+                    },
+                    saveCard: formData.saveCard
+                };
+
+                // Submit payment
+                const response = await fetch(`${API_BASE_URL}/payment/visa-deposit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('success', 'Uğurla Tamamlandı', 'Ödəniş uğurla tamamlandı');
+                    
+                    // Redirect after a short delay to let user see the toast
+                    setTimeout(() => {
+                        window.location.href = '../debug/tmp.html';
+                    }, 2000);
+                } else {
+                    // More detailed error handling
+                    let errorMessage = result.message || 'Xəta baş verdi';
+                    
+                    // Handle specific error cases
+                    if (result.message && result.message.includes('Payment method not found')) {
+                        errorMessage = 'Visa ödəniş metodu mövcud deyil';
+                    } else if (result.message && result.message.includes('Amount must be between')) {
+                        errorMessage = result.message.replace('Amount must be between', 'Məbləğ arasında olmalıdır');
+                    } else if (result.message && result.message.includes('required')) {
+                        errorMessage = 'Bütün məcburi sahələri doldurun';
+                    }
+                    
+                    showToast('error', 'Tamamlana Bilmədi', errorMessage);
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                
+                // Different error messages based on error type
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showToast('error', 'Bağlantı Xətası', 'Server ilə əlaqə saxlanıla bilmir. İnternet bağlantınızı yoxlayın.');
+                } else if (error.name === 'SyntaxError') {
+                    showToast('error', 'Server Xətası', 'Server cavabında xəta. Dəstək xidməti ilə əlaqə saxlayın.');
+                } else {
+                    showToast('error', 'Gözlənilməz Xəta', 'Gözlənilməz xəta baş verdi. Xahiş edirik yenidən cəhd edin.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

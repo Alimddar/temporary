@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Management - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar-active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        .dark-input {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: #f9fafb;
+        }
+        .dark-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 1px #6366f1;
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-800 shadow-lg">
+            <div class="p-6">
+                <div class="gradient-bg text-white p-4 rounded-lg text-center">
+                    <h1 class="text-xl font-bold">Admin Panel</h1>
+                    <p class="text-sm opacity-90">Management Dashboard</p>
+                </div>
+            </div>
+            
+            <nav class="mt-6">
+                <div class="px-4 space-y-2">
+                    <a href="dashboard.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="users.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Users
+                    </a>
+                    <a href="balances.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        Balances
+                    </a>
+                    <a href="payments.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                        Payments
+                    </a>
+                    <a href="transactions.html" class="sidebar-link flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors sidebar-active text-white">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        Transactions
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-gray-800 shadow-sm border-b border-gray-700">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Transaction Management</h2>
+                        <p class="text-sm text-gray-400">Review and approve pending transactions</p>
+                    </div>
+                    <div class="flex items-center">
+                        <button id="logoutBtn" class="text-gray-300 hover:text-white transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Transactions Content -->
+            <main class="p-6">
+                <div class="bg-gray-800 rounded-xl shadow-sm">
+                    <div class="p-6 border-b border-gray-700">
+                        <h3 class="text-lg font-semibold text-white">Pending Transactions</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-900">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Transaction ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Amount</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-gray-800 divide-y divide-gray-700" id="transactionsTableBody">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#TXN001</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-white">John Doe</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">$150.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">Withdrawal</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">2024-01-15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 mr-2">Approve</button>
+                                        <button class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#TXN002</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-white">Jane Smith</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">$75.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">Deposit</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">2024-01-15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 mr-2">Approve</button>
+                                        <button class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Reject</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
+    <script>
+        // Page-specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Transactions page loading...');
+            
+            if (!AuthManager.isAuthenticated()) {
+                console.log('Not authenticated, redirecting to login');
+                window.location.href = '../auth/login.html';
+                return;
+            }
+            
+            // Load transactions data
+            loadTransactionsData();
+        });
+
+        // Load transactions data
+        async function loadTransactionsData() {
+            try {
+                const response = await APIClient.getPendingTransactions();
+                if (response && response.success) {
+                    renderTransactionsTable(response.data);
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                DashboardManager.showNotification('Error loading transactions', 'error');
+            }
+        }
+
+        // Render transactions table
+        function renderTransactionsTable(transactions) {
+            const tbody = document.getElementById('transactionsTableBody');
+            tbody.innerHTML = '';
+            
+            transactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">#${transaction.transactionId}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div>
+                                <div class="text-sm font-medium text-white">${transaction.user.firstName} ${transaction.user.lastName}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${transaction.amount} AZN</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${transaction.type}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${new Date(transaction.createdAt).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 mr-2" 
+                                onclick="approveTransaction('${transaction.transactionId}')">Approve</button>
+                        <button class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600" 
+                                onclick="rejectTransaction('${transaction.transactionId}')">Reject</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Transaction management functions
+        async function approveTransaction(transactionId) {
+            try {
+                const response = await APIClient.approveTransaction(transactionId);
+                if (response.success) {
+                    DashboardManager.showNotification('Transaction approved successfully', 'success');
+                    loadTransactionsData(); // Reload transactions
+                }
+            } catch (error) {
+                console.error('Error approving transaction:', error);
+                DashboardManager.showNotification('Error approving transaction', 'error');
+            }
+        }
+
+        async function rejectTransaction(transactionId) {
+            try {
+                const response = await APIClient.rejectTransaction(transactionId);
+                if (response.success) {
+                    DashboardManager.showNotification('Transaction rejected successfully', 'success');
+                    loadTransactionsData(); // Reload transactions
+                }
+            } catch (error) {
+                console.error('Error rejecting transaction:', error);
+                DashboardManager.showNotification('Error rejecting transaction', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - BetButa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .dashboard {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .info-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .info-section h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .info-item {
+            margin-bottom: 10px;
+        }
+        .info-item strong {
+            color: #333;
+        }
+        .balance {
+            font-size: 1.5em;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            padding: 15px;
+            background-color: #f8d7da;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>User Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        
+        <div id="loading" class="loading">Loading user information...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="content" style="display: none;">
+            <div class="info-section">
+                <h3>Profile Information</h3>
+                <div class="info-item">
+                    <strong>Username:</strong> <span id="username"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Email:</strong> <span id="email"></span>
+                </div>
+                <div class="info-item">
+                    <strong>First Name:</strong> <span id="firstName"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Last Name:</strong> <span id="lastName"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Last Login:</strong> <span id="lastLogin"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Member Since:</strong> <span id="createdAt"></span>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h3>Balance Information</h3>
+                <div class="info-item">
+                    <strong>Current Balance:</strong> <span id="balance" class="balance"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Currency:</strong> <span id="currency"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Last Updated:</strong> <span id="balanceLastUpdated"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        async function loadUserData() {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                showError('No authentication token found. Please login again.');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                return;
+            }
+            
+            try {
+                // Fetch user profile
+                const profileResponse = await fetch(`${API_BASE_URL}/auth/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!profileResponse.ok) {
+                    throw new Error('Failed to fetch profile data');
+                }
+                
+                const profileData = await profileResponse.json();
+                
+                // Fetch user balance
+                const balanceResponse = await fetch(`${API_BASE_URL}/auth/balance`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!balanceResponse.ok) {
+                    throw new Error('Failed to fetch balance data');
+                }
+                
+                const balanceData = await balanceResponse.json();
+                
+                // Display user data
+                displayUserData(profileData.data.user, balanceData.data.balance);
+                
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showError('Failed to load user data. Please try again.');
+            }
+        }
+        
+        function displayUserData(user, balance) {
+            document.getElementById('username').textContent = user.username;
+            document.getElementById('email').textContent = user.email;
+            document.getElementById('firstName').textContent = user.firstName;
+            document.getElementById('lastName').textContent = user.lastName;
+            document.getElementById('lastLogin').textContent = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never';
+            document.getElementById('createdAt').textContent = new Date(user.createdAt).toLocaleString();
+            
+            document.getElementById('balance').textContent = balance.formatted;
+            document.getElementById('currency').textContent = balance.currency;
+            document.getElementById('balanceLastUpdated').textContent = new Date(balance.lastUpdated).toLocaleString();
+            
+            // Hide loading and show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+        
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'index.html';
+        }
+        
+        // Load user data when page loads
+        window.addEventListener('load', loadUserData);
+    </script>
+</body>
+</html>

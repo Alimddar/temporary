@@ -1,0 +1,620 @@
+// models/PaymentMethod.js
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+  const PaymentMethod = sequelize.define('PaymentMethod', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    displayName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    type: {
+      type: DataTypes.ENUM('card', 'crypto', 'wallet'),
+      allowNull: false
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    minAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
+    },
+    maxAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
+    },
+    commission: {
+      type: DataTypes.DECIMAL(5, 2),
+      defaultValue: 0
+    },
+    icon: {
+      type: DataTypes.STRING
+    },
+    sortOrder: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    }
+  });
+
+  return PaymentMethod;
+};
+
+// models/PaymentAccount.js
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+  const PaymentAccount = sequelize.define('PaymentAccount', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    paymentMethodId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'PaymentMethods',
+        key: 'id'
+      }
+    },
+    accountType: {
+      type: DataTypes.STRING, // 'card', 'wallet_address', 'account_number'
+      allowNull: false
+    },
+    accountDetails: {
+      type: DataTypes.JSON, // Store card numbers, wallet addresses, etc.
+      allowNull: false
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    priority: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1
+    }
+  });
+
+  return PaymentAccount;
+};
+
+// models/Transaction.js
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+  const Transaction = sequelize.define('Transaction', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    paymentMethodId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'PaymentMethods',
+        key: 'id'
+      }
+    },
+    paymentAccountId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'PaymentAccounts',
+        key: 'id'
+      }
+    },
+    amount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
+    },
+    commission: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0
+    },
+    totalAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'processing', 'completed', 'failed', 'cancelled'),
+      defaultValue: 'pending'
+    },
+    transactionId: {
+      type: DataTypes.STRING,
+      unique: true
+    },
+    paymentDetails: {
+      type: DataTypes.JSON // Store transaction-specific details
+    },
+    expiresAt: {
+      type: DataTypes.DATE
+    }
+  });
+
+  return Transaction;
+};
+
+// models/index.js
+const { Sequelize } = require('sequelize');
+const config = require('../config/database');
+
+const sequelize = new Sequelize(config.database, config.username, config.password, {
+  host: config.host,
+  dialect: config.dialect,
+  logging: false
+});
+
+const db = {
+  sequelize,
+  Sequelize,
+  PaymentMethod: require('./PaymentMethod')(sequelize),
+  PaymentAccount: require('./PaymentAccount')(sequelize),
+  Transaction: require('./Transaction')(sequelize)
+};
+
+// Define associations
+db.PaymentMethod.hasMany(db.PaymentAccount, { foreignKey: 'paymentMethodId' });
+db.PaymentAccount.belongsTo(db.PaymentMethod, { foreignKey: 'paymentMethodId' });
+
+db.PaymentMethod.hasMany(db.Transaction, { foreignKey: 'paymentMethodId' });
+db.Transaction.belongsTo(db.PaymentMethod, { foreignKey: 'paymentMethodId' });
+
+db.PaymentAccount.hasMany(db.Transaction, { foreignKey: 'paymentAccountId' });
+db.Transaction.belongsTo(db.PaymentAccount, { foreignKey: 'paymentAccountId' });
+
+module.exports = db;
+
+// services/PaymentService.js
+const crypto = require('crypto');
+const { PaymentMethod, PaymentAccount, Transaction } = require('../models');
+
+class PaymentService {
+  // Format card number with dashes
+  formatCardNumber(cardNumber) {
+    return cardNumber.replace(/(\d{4})(?=\d)/g, '$1-');
+  }
+
+  // Get active payment account for a method
+  async getActivePaymentAccount(paymentMethodId) {
+    const account = await PaymentAccount.findOne({
+      where: {
+        paymentMethodId,
+        isActive: true
+      },
+      order: [['priority', 'DESC']]
+    });
+    
+    if (!account) {
+      throw new Error('No active payment account available');
+    }
+    
+    return account;
+  }
+
+  // Create deposit transaction
+  async createDeposit(userId, paymentMethodId, amount) {
+    const paymentMethod = await PaymentMethod.findByPk(paymentMethodId);
+    
+    if (!paymentMethod || !paymentMethod.isActive) {
+      throw new Error('Payment method not available');
+    }
+
+    // Validate amount
+    if (amount < paymentMethod.minAmount || amount > paymentMethod.maxAmount) {
+      throw new Error(`Amount must be between ${paymentMethod.minAmount} and ${paymentMethod.maxAmount}`);
+    }
+
+    // Calculate commission
+    const commission = (amount * paymentMethod.commission) / 100;
+    const totalAmount = amount + commission;
+
+    // Get active payment account
+    const paymentAccount = await this.getActivePaymentAccount(paymentMethodId);
+
+    // Generate unique transaction ID
+    const transactionId = `TXN${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+    // Prepare payment details based on payment type
+    let paymentDetails = {};
+    
+    switch (paymentMethod.type) {
+      case 'card':
+        paymentDetails = {
+          cardNumber: this.formatCardNumber(paymentAccount.accountDetails.cardNumber),
+          cardHolder: paymentAccount.accountDetails.cardHolder,
+          bank: paymentAccount.accountDetails.bank
+        };
+        break;
+      
+      case 'crypto':
+        paymentDetails = {
+          walletAddress: paymentAccount.accountDetails.walletAddress,
+          network: paymentAccount.accountDetails.network
+        };
+        break;
+      
+      case 'wallet':
+        paymentDetails = {
+          accountNumber: paymentAccount.accountDetails.accountNumber,
+          accountName: paymentAccount.accountDetails.accountName
+        };
+        break;
+    }
+
+    // Create transaction
+    const transaction = await Transaction.create({
+      userId,
+      paymentMethodId,
+      paymentAccountId: paymentAccount.id,
+      amount,
+      commission,
+      totalAmount,
+      transactionId,
+      paymentDetails,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000) // 30 minutes expiry
+    });
+
+    return {
+      transaction,
+      paymentMethod,
+      paymentDetails
+    };
+  }
+
+  // Update transaction status
+  async updateTransactionStatus(transactionId, status) {
+    const transaction = await Transaction.findOne({
+      where: { transactionId }
+    });
+
+    if (!transaction) {
+      throw new Error('Transaction not found');
+    }
+
+    transaction.status = status;
+    await transaction.save();
+
+    return transaction;
+  }
+
+  // Get user transactions
+  async getUserTransactions(userId, limit = 10, offset = 0) {
+    return await Transaction.findAndCountAll({
+      where: { userId },
+      include: [{
+        model: PaymentMethod,
+        attributes: ['name', 'displayName', 'type']
+      }],
+      order: [['createdAt', 'DESC']],
+      limit,
+      offset
+    });
+  }
+}
+
+module.exports = new PaymentService();
+
+// controllers/PaymentController.js
+const PaymentService = require('../services/PaymentService');
+const { PaymentMethod } = require('../models');
+
+class PaymentController {
+  // Get all payment methods
+  async getPaymentMethods(req, res) {
+    try {
+      const methods = await PaymentMethod.findAll({
+        where: { isActive: true },
+        order: [['sortOrder', 'ASC']],
+        attributes: ['id', 'name', 'displayName', 'type', 'minAmount', 'maxAmount', 'commission', 'icon']
+      });
+
+      res.json({
+        success: true,
+        data: methods
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Create deposit
+  async createDeposit(req, res) {
+    try {
+      const { paymentMethodId, amount } = req.body;
+      const userId = req.user.id; // Assuming user is authenticated
+
+      const result = await PaymentService.createDeposit(userId, paymentMethodId, amount);
+
+      res.json({
+        success: true,
+        data: {
+          transactionId: result.transaction.transactionId,
+          amount: result.transaction.amount,
+          commission: result.transaction.commission,
+          totalAmount: result.transaction.totalAmount,
+          paymentDetails: result.paymentDetails,
+          expiresAt: result.transaction.expiresAt,
+          paymentMethod: {
+            name: result.paymentMethod.displayName,
+            type: result.paymentMethod.type
+          }
+        }
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Check transaction status
+  async checkTransaction(req, res) {
+    try {
+      const { transactionId } = req.params;
+      
+      const transaction = await PaymentService.updateTransactionStatus(transactionId, req.body.status);
+      
+      res.json({
+        success: true,
+        data: {
+          transactionId: transaction.transactionId,
+          status: transaction.status
+        }
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Get user transactions
+  async getUserTransactions(req, res) {
+    try {
+      const userId = req.user.id;
+      const { page = 1, limit = 10 } = req.query;
+      const offset = (page - 1) * limit;
+
+      const result = await PaymentService.getUserTransactions(userId, parseInt(limit), offset);
+
+      res.json({
+        success: true,
+        data: {
+          transactions: result.rows,
+          total: result.count,
+          page: parseInt(page),
+          totalPages: Math.ceil(result.count / limit)
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+}
+
+module.exports = new PaymentController();
+
+// routes/payment.js
+const express = require('express');
+const router = express.Router();
+const PaymentController = require('../controllers/PaymentController');
+const authMiddleware = require('../middleware/auth'); // Your auth middleware
+
+// Public routes
+router.get('/methods', PaymentController.getPaymentMethods);
+
+// Protected routes
+router.use(authMiddleware); // Apply auth middleware to all routes below
+
+router.post('/deposit', PaymentController.createDeposit);
+router.get('/transactions', PaymentController.getUserTransactions);
+router.patch('/transaction/:transactionId/status', PaymentController.checkTransaction);
+
+module.exports = router;
+
+// seed/paymentMethods.js
+const seedPaymentMethods = async (db) => {
+  const methods = [
+    {
+      name: 'card_to_card',
+      displayName: 'Card To Card Deposit',
+      type: 'card',
+      minAmount: 5,
+      maxAmount: 10000,
+      commission: 0,
+      icon: 'card2card.png',
+      sortOrder: 1
+    },
+    {
+      name: 'auto_mpay',
+      displayName: 'Auto Mpay',
+      type: 'wallet',
+      minAmount: 1,
+      maxAmount: 10000,
+      commission: 0,
+      icon: 'mpay.png',
+      sortOrder: 2
+    },
+    {
+      name: 'visa_mastercard',
+      displayName: 'Visa/Mastercard',
+      type: 'card',
+      minAmount: 5,
+      maxAmount: 10000,
+      commission: 0,
+      icon: 'visa_mc.png',
+      sortOrder: 3
+    },
+    {
+      name: 'auto_m10',
+      displayName: 'Auto M10',
+      type: 'wallet',
+      minAmount: 10,
+      maxAmount: 10000,
+      commission: 0,
+      icon: 'm10.png',
+      sortOrder: 4
+    },
+    {
+      name: 'usdt',
+      displayName: 'USDT Deposit',
+      type: 'crypto',
+      minAmount: 1,
+      maxAmount: 10000,
+      commission: 0,
+      icon: 'tether.png',
+      sortOrder: 5
+    },
+    {
+      name: 'tron',
+      displayName: 'Tron Deposit',
+      type: 'crypto',
+      minAmount: 1,
+      maxAmount: 10000,
+      commission: 0,
+      icon: 'tron.png',
+      sortOrder: 6
+    }
+  ];
+
+  for (const method of methods) {
+    await db.PaymentMethod.findOrCreate({
+      where: { name: method.name },
+      defaults: method
+    });
+  }
+
+  // Seed payment accounts
+  const accounts = [
+    {
+      paymentMethodId: 1,
+      accountType: 'card',
+      accountDetails: {
+        cardNumber: '1234567891011213',
+        cardHolder: 'PAYMENT PROCESSOR',
+        bank: 'Sample Bank'
+      }
+    },
+    {
+      paymentMethodId: 5,
+      accountType: 'wallet_address',
+      accountDetails: {
+        walletAddress: 'TRX1234567890ABCDEFGHIJKLMNOP',
+        network: 'TRC20'
+      }
+    }
+  ];
+
+  for (const account of accounts) {
+    await db.PaymentAccount.findOrCreate({
+      where: { 
+        paymentMethodId: account.paymentMethodId,
+        accountType: account.accountType 
+      },
+      defaults: account
+    });
+  }
+};
+
+module.exports = seedPaymentMethods;
+
+// app.js
+const express = require('express');
+const app = express();
+const db = require('./models');
+const paymentRoutes = require('./routes/payment');
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api/payment', paymentRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error'
+  });
+});
+
+// Database sync and server start
+const PORT = process.env.PORT || 3000;
+
+db.sequelize.sync({ alter: true }).then(async () => {
+  // Seed initial data
+  const seedPaymentMethods = require('./seed/paymentMethods');
+  await seedPaymentMethods(db);
+  
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('Unable to connect to database:', err);
+});
+
+
+
+
+I understand you want to build a payment system where users can deposit funds using various payment methods. Based on your screenshot, I can see you have multiple payment options like Card to Card, Auto Mpay, Visa/Mastercard, USDT, Tron, etc., each with their own limits and commission rates.
+
+Let me help you create a robust payment system using Express.js and Sequelize. I'll structure this with proper models, routes, and controllers.I've created a comprehensive payment system for you that handles all the payment methods shown in your screenshot. Here's what the system includes:
+
+## Key Features:
+
+### 1. **Database Models**
+- **PaymentMethod**: Stores all payment methods (Card to Card, Auto Mpay, Visa/Mastercard, USDT, etc.)
+- **PaymentAccount**: Stores the actual payment accounts (card numbers, wallet addresses)
+- **Transaction**: Records all deposit transactions
+
+### 2. **Payment Service**
+- Formats card numbers (1234-5678-9101-1213)
+- Validates amounts against min/max limits
+- Calculates commissions
+- Creates transactions with expiry times
+- Returns payment details to users
+
+### 3. **API Endpoints**
+- `GET /api/payment/methods` - Get all available payment methods
+- `POST /api/payment/deposit` - Create a new deposit
+- `GET /api/payment/transactions` - Get user's transaction history
+- `PATCH /api/payment/transaction/:id/status` - Update transaction status
+
+### 4. **How It Works**
+
+When a user wants to deposit:
+1. They select a payment method
+2. Enter the amount
+3. System validates the amount against limits
+4. Returns the payment details (card number, wallet address, etc.)
+5. User makes the payment
+6. Transaction is tracked with a unique ID
+
+### 5. **Security Features**
+- Authentication middleware for protected routes
+- Transaction expiry (30 minutes)
+- Unique transaction IDs
+- Status tracking (pending, processing, completed, failed)
